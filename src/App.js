@@ -31,6 +31,7 @@ const LeftPanel = (props, context) => (
                     <ContentBlockTitle>Load page in main view</ContentBlockTitle>
                     <List>
                         <ListItem link="/form/" title="Form" linkView="#main-view" linkClosePanel></ListItem>
+                        <ListItem link="/simpleForm/" title="Simple Form" linkView="#main-view" linkClosePanel></ListItem>
                     </List>
                 </Page>
             </Pages>
