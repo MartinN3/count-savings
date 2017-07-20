@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Page, Navbar, Popup, ContentBlockTitle, List, ListItem, FormLabel, FormInput, Button, GridCol, GridRow, ContentBlock, ButtonsSegmented} from 'framework7-react';
-import { ohrevVodyConstants } from './calc';
+import {Page, Navbar, NavRight, Link, Popup, View, Pages, List, ListItem, FormInput, Button, ContentBlock } from 'framework7-react';
+import { ohrevVodyConstants, Termic } from './calc';
 //SimpleCalc
 
 const simpleCalcConstants = {
@@ -32,7 +32,8 @@ export class SimpleForm extends Component {
             },
             output: {
                 SimpleForm: '',
-                popupVisible: false
+                popupVisible: false,
+                Termic: {},
             }
         };
 
@@ -109,6 +110,7 @@ export class SimpleForm extends Component {
                             big
                             fill
                             color="green"
+                            openPopup="#outputPopup"
                             disabled={!isValid}
                             onClick={(e) => {
                                 e.preventDefault();
@@ -119,13 +121,21 @@ export class SimpleForm extends Component {
                                     }),
                                     popupVisible: true
                                 });
+                                const c = new Termic(this.state.output.SimpleForm);
+                                this.handleOutput({
+                                    Termic: c.init(),
+                                });
                                 console.log(this.state);
 
                             }}>Send</Button>
                     </ContentBlock>
-                    <Popup opened={this.state.output.popupVisible} theme="lightblue">
+                    <Popup id="outputPopup" opened={this.state.output.popupVisible} theme="lightblue">
                         <ContentBlock>
                             <p>Vysledek vysel {this.state.output.SimpleForm}. Jedna se o standartni pripad.</p>
+                            <p>Instalovana plocha termiky {this.state.output.Termic.installedAreaTermicVzorec} m2</p>
+                            <p>Instalovane panely termiky {this.state.output.Termic.installedPanelsTermicVzorec} ks</p>
+                            <p>Investice do termickych panelu {this.state.output.Termic.investmentTermicVzorec} kc</p>
+                            <p>Uspory diky termice {this.state.output.Termic.savingsTermicVzorec} kc</p>
                             <p><a onClick={() => {
                                 this.handleOutput({
                                     popupVisible: false,

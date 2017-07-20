@@ -40,15 +40,6 @@ export const climaConstants = {
 
 // v m2
 // Kolik termickych panelu potrebuju na pokryti vypocitane spotreby
-export const installedAreaTermicVzorec = ({
-    ohrevVodyVzorecVysledek
-}) => {
-    let dailyKwhConsumption = kwhToGj(ohrevVodyVzorecVysledek);
-    return dailyKwhConsumption / ( savingsConstants.efficiencyPanelTermic * climaConstants.czechRepublic.dailyIntensitySun)
-}
-
-// v m2
-// Kolik termickych panelu potrebuju na pokryti vypocitane spotreby
 export const installedAreaFveVzorec = ({
     ohrevVodyVzorecVysledek
 }) => {
@@ -56,24 +47,76 @@ export const installedAreaFveVzorec = ({
     return dailyKwhConsumption / ( savingsConstants.efficiencyPanelFVE * climaConstants.czechRepublic.dailyIntensitySun)
 }
 
-export const installedPanelsTermic = ({
-    installedAreaTermic = installedAreaTermicVzorec(ohrevVodyVzorecVysledek),
-}) => {
-    return installedAreaTermic / savingsConstants.areaPanelTermic;
-}
 
-export const installedPanelsFVE = ({
-    installedAreaFVE = installedAreaFveVzorec(ohrevVodyVzorecVysledek),
+
+// arg installedAreaFveVzorec(ohrevVodyVzorecVysledek)
+export const installedPanelsFVEVzorec = ({
+    installedAreaFVE,
 }) => {
     return installedAreaFVE / savingsConstants.areaPanelFVE;
 }
 
-//TODO Kurva bacha vole musis volat return funkce nejak at ti ho posle u obou
-export const investmentTermic = () => installedPanelsTermic() * savingsConstants.pricePanelTermic;
 
-export const investmentFVE = () => installedPanelsFVE() * savingsConstants.pricePanelFVE;
+export const investmentFVE = (installedPanelsFVEVysledek) => installedPanelsFVEVysledek * savingsConstants.pricePanelFVE;
 
-export const savingsTermic = () => ( climaConstants.czechRepublic.prumernaDenniZareZa12mesicukWh * installedPanelsTermic() * savingsConstants.efficiencyPanelTermic ); * 30;
+export const savingsFVE = (installedPanelsFVEVysledek) =>
+    ( climaConstants.czechRepublic.prumernaDenniZareZa12mesicukWh * installedPanelsFVEVysledek * savingsConstants.efficiencyPanelFVE );
 
-export const savingsFVE = () => ( climaConstants.czechRepublic.prumernaDenniZareZa12mesicukWh * installedPanelsFVE() * savingsConstants.efficiencyPanelFVE );
+export class Termic {
+    constructor(vysledek) {
+        this.form = {
+            input: {
+                SimpleForm: vysledek,
+            },
+            output: {
+                SimpleForm: undefined,
+            },
+            vysledek: {
+                installedAreaTermicVzorec: undefined,
+                installedPanelsTermicVzorec: undefined,
+                investmentTermicVzorec: undefined,
+                savingsTermicVzorec: undefined,
+            }
+        }
+    }
 
+    // v m2
+    // Kolik termickych panelu potrebuju na pokryti vypocitane spotreby
+    installedAreaTermicVzorec = ({
+        ohrevVodyVzorecVysledek
+    }) => {
+        console.log(ohrevVodyVzorecVysledek);
+        let dailyKwhConsumption = kwhToGj(ohrevVodyVzorecVysledek);
+        return dailyKwhConsumption / ( savingsConstants.efficiencyPanelTermic * climaConstants.czechRepublic.dailyIntensitySun)
+    }
+
+    // arg installedAreaTermicVzorec(ohrevVodyVzorecVysledek)
+    installedPanelsTermicVzorec = ({
+    installedAreaTermicVysledek,
+    }) => installedAreaTermicVysledek / savingsConstants.areaPanelTermic;
+
+    investmentTermicVzorec = ({
+        installedPanelsTermicVysledek
+    }) => installedPanelsTermicVysledek * savingsConstants.pricePanelTermic;
+
+    savingsTermicVzorec = ({
+        investmentTermicVysledek
+    }) => (climaConstants.czechRepublic.prumernaDenniZareZa12mesicukWh * investmentTermicVysledek * savingsConstants.efficiencyPanelTermic) * 30;
+
+    init() {
+        this.form.vysledek.installedAreaTermicVzorec = this.installedAreaTermicVzorec({
+            ohrevVodyVzorecVysledek: this.form.input.SimpleForm
+        });
+        this.form.vysledek.installedPanelsTermicVzorec = this.installedPanelsTermicVzorec({
+            installedAreaTermicVysledek: this.form.vysledek.installedAreaTermicVzorec
+        });
+        this.form.vysledek.investmentTermicVzorec = this.investmentTermicVzorec({
+            installedPanelsTermicVysledek: this.form.vysledek.installedPanelsTermicVzorec
+        });
+        this.form.vysledek.savingsTermicVzorec = this.savingsTermicVzorec({
+            investmentTermicVysledek: this.form.vysledek.investmentTermicVzorec
+        });
+
+        return this.form.vysledek;
+    }
+}
