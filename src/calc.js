@@ -1,13 +1,9 @@
 /**
  * Created by martin on 15.7.17.
  */
-/**
- * Created by martin on 15.7.17.
- */
 
 //helper Functions
-
-export const kwhToGj = (dataInKwh) => dataInKwh * 0.0036;
+export const whToJoule = (dataInWh) => dataInWh * 3600; // Joule
 
 //Constants
 export const ohrevVodyConstants = {
@@ -32,9 +28,8 @@ export const savingsConstants = {
 
 export const climaConstants = {
     'czechRepublic': {
-        'dailyIntensitySun': 6.758, //kW/day sunshine per day
-        'prumernaDenniZareZa12mesicukWh': 35, //kWh
-        'prumernaDenniZareZa12mesicuGj': kwhToGj(35),
+        'dailyIntensitySun': 6758, // w/day sunshine per day
+        'prumernaDenniZareZa12mesicu': 35000, // wh
     }
 }
 
@@ -43,8 +38,8 @@ export const climaConstants = {
 export const installedAreaFveVzorec = ({
     ohrevVodyVzorecVysledek
 }) => {
-    let dailyKwhConsumption = kwhToGj(ohrevVodyVzorecVysledek);
-    return dailyKwhConsumption / ( savingsConstants.efficiencyPanelFVE * climaConstants.czechRepublic.dailyIntensitySun)
+    let dailyWhConsumption = whToJoule(ohrevVodyVzorecVysledek);
+    return dailyWhConsumption / ( savingsConstants.efficiencyPanelFVE * climaConstants.czechRepublic.dailyIntensitySun)
 }
 
 
@@ -56,11 +51,10 @@ export const installedPanelsFVEVzorec = ({
     return installedAreaFVE / savingsConstants.areaPanelFVE;
 }
 
-
 export const investmentFVE = (installedPanelsFVEVysledek) => installedPanelsFVEVysledek * savingsConstants.pricePanelFVE;
 
 export const savingsFVE = (installedPanelsFVEVysledek) =>
-    ( climaConstants.czechRepublic.prumernaDenniZareZa12mesicukWh * installedPanelsFVEVysledek * savingsConstants.efficiencyPanelFVE );
+    ( climaConstants.czechRepublic.prumernaDenniZareZa12mesicu * installedPanelsFVEVysledek * savingsConstants.efficiencyPanelFVE );
 
 export class Termic {
     constructor(vysledek) {
@@ -82,26 +76,20 @@ export class Termic {
 
     // v m2
     // Kolik termickych panelu potrebuju na pokryti vypocitane spotreby
-    installedAreaTermicVzorec = ({
-        ohrevVodyVzorecVysledek
-    }) => {
-        console.log(ohrevVodyVzorecVysledek);
-        let dailyKwhConsumption = kwhToGj(ohrevVodyVzorecVysledek);
-        return dailyKwhConsumption / ( savingsConstants.efficiencyPanelTermic * climaConstants.czechRepublic.dailyIntensitySun)
+    installedAreaTermicVzorec = ({ ohrevVodyVzorecVysledek }) => {
+        let dailyWhConsumption = whToJoule(ohrevVodyVzorecVysledek);
+        return dailyWhConsumption / ( savingsConstants.efficiencyPanelTermic * climaConstants.czechRepublic.dailyIntensitySun)
     }
 
     // arg installedAreaTermicVzorec(ohrevVodyVzorecVysledek)
-    installedPanelsTermicVzorec = ({
-    installedAreaTermicVysledek,
-    }) => installedAreaTermicVysledek / savingsConstants.areaPanelTermic;
+    installedPanelsTermicVzorec = ({ installedAreaTermicVysledek }) =>
+    installedAreaTermicVysledek / savingsConstants.areaPanelTermic;
 
-    investmentTermicVzorec = ({
-        installedPanelsTermicVysledek
-    }) => installedPanelsTermicVysledek * savingsConstants.pricePanelTermic;
+    investmentTermicVzorec = ({ installedPanelsTermicVysledek }) =>
+    installedPanelsTermicVysledek * savingsConstants.pricePanelTermic;
 
-    savingsTermicVzorec = ({
-        investmentTermicVysledek
-    }) => (climaConstants.czechRepublic.prumernaDenniZareZa12mesicukWh * investmentTermicVysledek * savingsConstants.efficiencyPanelTermic) * 30;
+    savingsTermicVzorec = ({ investmentTermicVysledek }) =>
+    (climaConstants.czechRepublic.prumernaDenniZareZa12mesicu * investmentTermicVysledek * savingsConstants.efficiencyPanelTermic) * 30;
 
     init() {
         this.form.vysledek.installedAreaTermicVzorec = this.installedAreaTermicVzorec({

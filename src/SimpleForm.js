@@ -7,7 +7,7 @@ const simpleCalcConstants = {
     'pocetOsob': 3,
     'spotrebaTUV': 50, //Litres day
     'denniSpotreba': {
-        'spotrebice': 7.36, //kWh day
+        'spotrebice': 7360, //wh day
     },
 };
 
